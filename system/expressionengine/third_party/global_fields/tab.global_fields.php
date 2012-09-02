@@ -60,12 +60,23 @@ class Global_fields_tab {
 
 		$this->EE->load->model('field_model');
 
+		// prepare api and get custom fields to get fieldtype settings
+		$this->EE->load->library('api'); 
+		$this->EE->api->instantiate('channel_fields');
+		$custom_fields = $this->EE->api_channel_fields->fetch_custom_channel_fields();
+
+
 		$i = 0;
 		// build our settings array which creates each field in the tab
 		// go grab the native setting for each field
 		foreach ($this->field_ids as $id)
 		{
 			$settings[ $i ] = $this->EE->field_model->get_field( $id )->row_array();
+
+			// get and merge the fieldtype settings
+			$field_settings = $this->EE->api_channel_fields->get_settings($id);
+			$settings[ $i ] = array_merge( $settings[ $i ], $field_settings );
+
 			$settings[ $i ]['field_data'] = $field_data[ $id ]; // inject the field data
 
 			// revert name to what the tab is expecting
