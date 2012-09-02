@@ -25,16 +25,16 @@ You can hide the tab and it's fields for any channel via publish layouts.
 #### Tested Fieldtypes
 
 Compatible with all first party fields:
-Checkboxes
-Date
-File
-Multi Select
-Radio Buttons
-Relationship [whoa]
-Select Dropdown
-Text Input
-Textarea
-Textarea (RTE)
+Checkboxes  
+Date  
+File  
+Multi Select  
+Radio Buttons  
+Relationship [whoa]  
+Select Dropdown  
+Text Input  
+Textarea  
+Textarea (RTE)  
 
 Anyt field that stores data outside of the native channel_data table will be incompatible for now. I haven't looked into it much but the main issue will be getting the contents of the field if field data exists.
 
