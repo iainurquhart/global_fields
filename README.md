@@ -22,6 +22,25 @@ Install the module, and then update the $field_ids array at the top of tab.globa
 
 You can hide the tab and it's fields for any channel via publish layouts.
 
+#### Tested Fieldtypes
+
+Compatible with all first party fields:
+Checkboxes
+Date
+File
+Multi Select
+Radio Buttons
+Relationship [whoa]
+Select Dropdown
+Text Input
+Textarea
+Textarea (RTE)
+
+Anyt field that stores data outside of the native channel_data table will be incompatible for now. I haven't looked into it much but the main issue will be getting the contents of the field if field data exists.
+
+That's not to say it isn't possible, it just needs more time than I have now.
+
+
 ### Outputting Data
 
 Outputting the data is the same as if the fields were part of the field group associated with the channel. 
