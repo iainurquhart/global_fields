@@ -14,7 +14,7 @@ GYPSY! I hear you cry.
 
 Not really. 
 
-This implementation is pretty simple, and for now all it works with are basic text inputs, textareas and checkboxes/selects.
+This implementation is surprisingly simple.
 
 ### Installing/Usage
 
@@ -25,6 +25,7 @@ You can hide the tab and it's fields for any channel via publish layouts.
 #### Tested Fieldtypes
 
 Compatible with all first party fields:
+
 Checkboxes  
 Date  
 File  
@@ -36,7 +37,7 @@ Text Input
 Textarea  
 Textarea (RTE)  
 
-Anyt field that stores data outside of the native channel_data table will be incompatible for now. I haven't looked into it much but the main issue will be getting the contents of the field if field data exists.
+Any field that stores data outside of the native channel_data table will be incompatible for now. I haven't looked into it much but the main issue will be getting the contents of the field if field data exists.
 
 That's not to say it isn't possible, it just needs more time than I have now.
 
