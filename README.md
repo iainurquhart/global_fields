@@ -18,9 +18,18 @@ This implementation is surprisingly simple.
 
 ### Installing/Usage
 
-Install the module, and then update the $field_ids array at the top of tab.global_fields.php to include all the field_ids you want to appear globally.
+Install the module, and then add the following lines to your config:
 
-You can hide the tab and it's fields for any channel via publish layouts.
+	$config['global_fields_tab_name'] = 'Global Fields';
+	$config['global_field_ids'] = array(4,5,6);
+
+'global_field_ids' is an array of the field_ids you want to make global. 
+
+In the example above, we're setting field_id_4, field_id_5 and field_id_6 to be global.
+
+'global_fields_tab_name' is the label which is applied to the tab, the default is 'Global Fields'
+
+You can hide the tab and it's fields for any channel they are not required via publish layouts.
 
 #### Tested Fieldtypes
 
@@ -50,7 +59,9 @@ The search parameter works fine too on the channel:entries tag as the data is st
 
 ### Caveats
 
-Probably more than I'm aware of right now.
+Native EE Search, Low Search and Supersearch will not search into these fields. Any add-on which looks at field group settings will simply ignore global fields.
+
+It seems like none of these add-ons have taken Tabs into consideration (I'm assuming because there aren't many Tab add-ons out there) and there are no hooks at this time that could be used for extending search add-ons to include Tab fields. There are some possible workarounds and I'm still investigating.
 
 ### Support and Feature Requests
 The add-on is not officially supported but send requests/bug reports/pull requests here to this repo.

@@ -19,9 +19,8 @@
 
 class Global_fields_tab {
 
-	// here is where we set the field_id_x cols we want to grab
-	// hard coded for proof of concept 
-	var $field_ids = array(2, 3, 4);
+	// our array of field ids, set in config
+	var $field_ids = array();
 	
 	/**
 	 * Constructor
@@ -29,7 +28,13 @@ class Global_fields_tab {
 	public function __construct()
 	{
 		$this->EE =& get_instance();
-		$this->EE->lang->language['global_fields'] = 'Global Fields';	
+
+		$this->EE->lang->loadfile('global_fields');
+		if( $this->EE->config->item('global_fields_tab_name') ) 
+		{
+			$this->EE->lang->language['global_fields'] = $this->EE->config->item('global_fields_tab_name');
+		}
+
 	}
 
 	/**
@@ -38,44 +43,70 @@ class Global_fields_tab {
 	function publish_tabs($channel_id, $entry_id = '')
 	{
 
-		$settings = array();
+		// --------------------------------------------------------------
+		//   make sure we have some fields to add
+		// --------------------------------------------------------------
+			$this->field_ids = $this->EE->config->item('global_field_ids');
 
-		// set default values for the fields in our tab
+			if( empty($this->field_ids) )
+			{
+				show_error('Please define global field IDs in your config.');
+			}
+		// --------------------------------------------------------------
+
+		// define some default vars & values
+		$tab_fields = array();
+		
 		foreach ($this->field_ids as $id)
 		{
 			$field_data[ $id ] = '';
 		}
 
+		// --------------------------------------------------------------
+		// fetch field data if it exists, simply via a query for now.
+		// --------------------------------------------------------------
+			if ($entry_id != '')
+			{
+				$data = $this->EE->db->get_where('channel_data', array('entry_id' => $entry_id))->row_array();
+				foreach ($this->field_ids as $id)
+				{
+					$field_data[ $id ] = (isset($data[ 'field_id_'.$id ])) ? $data[ 'field_id_'.$id ] : '';
+				}
+			}
+		// --------------------------------------------------------------
 
-		// fetch their data if it exists, simply via a query for now.
-		if ($entry_id != '')
-		{
-			$data = $this->EE->db->get_where('channel_data', array('entry_id' => $entry_id))->row_array();
+
+		// --------------------------------------------------------------
+		//  grab settings and populate our tab fields array
+		// --------------------------------------------------------------
+			$this->EE->load->model('field_model');
+
+			$i = 0;
+
+			// build our settings array which creates each field in the tab
+			// go grab the native setting for each field
 			foreach ($this->field_ids as $id)
 			{
-				$field_data[ $id ] = (isset($data[ 'field_id_'.$id ])) ? $data[ 'field_id_'.$id ] : '';
+
+				$tab_fields[ $i ] = $this->EE->field_model->get_field( $id )->row_array();
+
+				// field settings are encoded
+				if(isset($tab_fields[ $i ]['field_settings']))
+				{
+					$field_settings = unserialize(base64_decode($tab_fields[ $i ]['field_settings']));
+					$tab_fields[ $i ] = $tab_fields[ $i ] + $field_settings;
+				}
+
+				$tab_fields[ $i ]['field_data'] = $field_data[ $id ]; // inject the field data
+
+				// revert name to what the tab is expecting
+				// required so our field 'required' settings are honored etc
+				$tab_fields[ $i ]['field_name'] = 'global_fields__'.$tab_fields[ $i ]['field_id'];
+				$i++;
 			}
-		}
+		// --------------------------------------------------------------
 
-
-		$this->EE->load->model('field_model');
-
-		$i = 0;
-		// build our settings array which creates each field in the tab
-		// go grab the native setting for each field
-		foreach ($this->field_ids as $id)
-		{
-			$settings[ $i ] = $this->EE->field_model->get_field( $id )->row_array();
-			$settings[ $i ]['field_data'] = $field_data[ $id ]; // inject the field data
-
-			// revert name to what the tab is expecting
-			// required so our field 'required' settings are honored etc
-			$settings[ $i ]['field_name'] = 'global_fields__'.$settings[ $i ]['field_id'];
-			$i++;
-		}
-
-
-		return $settings;
+		return $tab_fields;
 	}
 
 	/**
@@ -87,6 +118,13 @@ class Global_fields_tab {
 
 		// reference our publish data
 		$this->data =& $this->EE->api_channel_entries->data;
+
+		$this->field_ids = $this->EE->config->item('global_field_ids');
+
+		if( empty($this->field_ids) )
+		{
+			return FALSE;
+		}
 
 		foreach ($this->field_ids as $id)
 		{
@@ -110,7 +148,7 @@ class Global_fields_tab {
 			// push to main api_channel_entries->data array
 			// et voila
 			$this->data['field_id_'.$id] = $this->data['revision_post']['field_id_'.$id] = $field_data;
-				
+
 		}
 
 	    return  FALSE;
